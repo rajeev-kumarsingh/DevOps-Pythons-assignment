@@ -4,7 +4,7 @@ set -e
 echo "Starting Flask Application..."
 
 APP_DIR="/home/ubuntu/flask_app"
-PORT=5000
+PORT=80
 LOG_FILE="$APP_DIR/server.log"
 
 # Navigate to the application directory

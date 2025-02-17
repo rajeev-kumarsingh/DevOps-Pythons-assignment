@@ -2,7 +2,7 @@
 # curl http://localhost:5000
 #!/bin/bash
 # Validate server is running
-url="http://localhost:5000"
+url="http://localhost:80"
 max_retries=10  # Number of times to check
 sleep_interval=5  # Time (in seconds) between checks
 retry_count=0

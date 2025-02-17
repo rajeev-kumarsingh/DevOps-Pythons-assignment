@@ -7,7 +7,7 @@ echo "Stopping Flask Application..."
 
 # Define application directory and port
 APP_DIR="/home/ubuntu/flask_app"
-PORT=5000
+PORT=80
 
 # Find process ID (PID) of the application running on the specified port
 PID=$(lsof -t -i:$PORT || true)
