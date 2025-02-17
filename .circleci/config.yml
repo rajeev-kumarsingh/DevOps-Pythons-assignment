@@ -34,14 +34,21 @@ jobs:
 
   s3-push:
     docker:
-    - image: amazon/aws-cli # Make sure this image has tar or install it manually
+    - image: amazon/aws-cli # Use an Amazon Linux-based image
     steps:
     - run:
         name: Install tar (if missing)
         command: |
           if ! command -v tar &> /dev/null; then
             echo "Installing tar..."
-            apt-get update && apt-get install -y tar
+            if command -v yum &> /dev/null; then
+              yum install -y tar
+            elif command -v apk &> /dev/null; then
+              apk add tar
+            else
+              echo "Error: Package manager not found. Cannot install tar."
+              exit 1
+            fi
           fi
     - attach_workspace:
         at: ~/repo
