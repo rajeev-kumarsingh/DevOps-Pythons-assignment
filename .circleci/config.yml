@@ -30,7 +30,7 @@ jobs:
           python -m unittest test_app.py
     - run:
         name: Create a ZIP file
-        command: zip -r build.zip build appspec.yml scripts
+        command: zip -r build.zip  templates README.md requirements.txt test_app.py web.py appspec.yml scripts
     - persist_to_workspace:
         root: .
         paths:
@@ -46,9 +46,10 @@ jobs:
         name: Install AWS CLI
         command: pip install  awscli
     - run:
-        name: Copy Files From S3
+        name: Copy Files to S3
         command: |
-          aws s3 cp build s3://python-assignment-cicd/build-$CIRCLE_SHA1/build.zip
+          ls -l  # Debugging step to check the files in the workspace
+          aws s3 cp build.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1.zip
   # Define the deploy Job
   deploy:
     executor: python-executor
