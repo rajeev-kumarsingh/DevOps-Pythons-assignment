@@ -1,34 +1,91 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:python:.
 version: 2.1
-orbs:
-  python: circleci/python@2
+# Define the Executor
+# Uses a Python 3.9 Docker image
+# The working directory is set to ~/repo
+executors:
+  python-executor:
+    docker:
+    - image: circleci/python:3.9
+    working_directory: ~/repo
+
 jobs:
-  test-python:
-    # Install dependencies and run tests
-    docker:
-      - image: cimg/python:3.8-node
+  # Define the test Job
+  test:
+    executor: python-executor
     steps:
-      - checkout
-      - python/install-packages
-      - run:
-          name: Run tests
-          command: pytest --junitxml=junit.xml || ((($? == 5)) && echo 'Did not find any tests to run.')
-      - store_test_results:
-          path: junit.xml
+    - checkout
+    # This job checks out your code from the Git repository
+    - run:
+        name: Install dependencies
+        command: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+    #Creates a virtual environment and installs dependencies.
+    # Runs your unit tests in test_app.py
+    - run:
+        name: Run Unit Tests
+        command: |
+          source venv/bin/activate
+          python -m unittest test_app.py
+    - run:
+        name: Create a ZIP file
+        command: zip -r build.zip build appspec.yml scripts
+    - persist_to_workspace:
+        root: .
+        paths:
+        - build.zip
+  s3-push:
+    docker:
+    - image: cimg/python:3.8.16
+    steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - run:
+        name: Install AWS CLI
+        command: pip install  awscli
+    - run:
+        name: Copy Files From S3
+        command: |
+          aws s3 cp build s3://python-assignment-cicd/build-$CIRCLE_SHA1/build.zip
+  # Define the deploy Job
   deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+    executor: python-executor
     steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+    - checkout
+    # Pulls the latest code from GitHub.
+    # Installs AWS CLI inside the CircleCI environment.
+
+    - run:
+        name: Install AWS CLI
+        command: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+    # Uses SCP (secure copy) to transfer the project files to the EC2 instance.
+    - run:
+        name: Trigger Codedeploy app
+        command: |
+          aws deploy create-deployment \
+          --region us-east-1 \
+          --application-name python-code-deploy-role-rajeev \
+          --deployment-group-name python-code-deploy-role \
+          --s3-location bucket=python-assignment-cicd,key=build-$CIRCLE_SHA1/build.zip,bundleType=zip \
+          --description "CircleCI Deployment for $CIRCLE_SHA1"
+
 workflows:
-  build-and-test:
+  version: 2
+  test_and_deploy:
     jobs:
-      - test-python
-    # - deploy:
-    #     requires:
-    #       - test-python
+    - test
+    - s3-push:
+        context: PYTHON-ASSIGNMENT
+    - require-approval:
+        type: approval
+        requires:
+        - s3-push
+    - deploy:
+        requires:
+        - test
+        - require-approval
+        context: PYTHON-ASSIGNMENT
