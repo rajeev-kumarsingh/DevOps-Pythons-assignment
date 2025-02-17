@@ -34,18 +34,20 @@ jobs:
 
   s3-push:
     docker:
-    - image: cimg/python:3.8.16
+    - image: amazon/aws-cli
     steps:
     - checkout
     - attach_workspace:
         at: ~/repo
     - run:
-        name: Install AWS CLI
-        command: pip install awscli
-    - run:
-        name: Copy Files to S3
+        name: Configure AWS Credentials
         command: |
-          ls -l ~/repo  # Debugging step to check if build.zip exists
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - run:
+        name: Upload to S3
+        command: |
+          ls -l ~/repo  # Debugging step
           aws s3 cp ~/repo/build.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1.zip
 
   deploy:
