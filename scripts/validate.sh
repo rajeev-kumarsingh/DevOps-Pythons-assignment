@@ -12,7 +12,7 @@ echo "Validating application at $url..."
 
 while [ $retry_count -lt $max_retries ]; do
   response=$(curl --write-out "%{http_code}" --silent --output /dev/null $url)
-  if [ "$response" -eq success_status_for_HTTP_requests ]; then
+  if [ "$response" -eq "success_status_for_HTTP_requests" ]; then
     echo "Validation successful: Application is running and reachable at $url"
     exit 0
   else
