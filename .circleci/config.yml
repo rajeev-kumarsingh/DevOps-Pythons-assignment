@@ -32,34 +32,17 @@ jobs:
         paths:
         - build.zip
 
-  s3-push:
+    s3-push:
     docker:
-    - image: amazon/aws-cli # Amazon Linux-based image
-    steps:
-    #- run:
-    #   name: Install gzip and tar (if missing)
-    #  command: |
-    #   if ! command -v gzip &> /dev/null; then
-    #    echo "Installing gzip..."
-    #   if command -v yum &> /dev/null; then
-    #  apk add gzip
-    # else
-    #  echo "Error: Package manager not found. Cannot install gzip."
-    # exit 1
-    #fi
-    #fi
-
-    #if ! command -v tar &> /dev/null; then
-    # echo "Installing tar..."
-    #if command -v yum &> /dev/null; then
-    # yum install -y tar
-    #elif command -v apk &> /dev/null; then
-    # apk add tar
-    #else
-    # echo "Error: Package manager not found. Cannot install tar."
-    #exit 1
-    #fi
-    #fi
+    - image: amazon/aws-cli
+      steps:
+    - run:
+        name: Install tar
+        command: |
+          if ! command -v tar &> /dev/null; then
+            echo "Installing tar..."
+            yum install -y tar || apk add tar || apt-get update && apt-get install -y tar
+          fi
     - attach_workspace:
         at: ~/repo
     - run:
