@@ -36,32 +36,30 @@ jobs:
     docker:
     - image: amazon/aws-cli # Amazon Linux-based image
     steps:
-    - run:
-        name: Install gzip and tar (if missing)
-        command: |
-          if ! command -v gzip &> /dev/null; then
-            echo "Installing gzip..."
-            if command -v yum &> /dev/null; then
-              yum install -y gzip
-            elif command -v apk &> /dev/null; then
-              apk add gzip
-            else
-              echo "Error: Package manager not found. Cannot install gzip."
-              exit 1
-            fi
-          fi
+    #- run:
+    #   name: Install gzip and tar (if missing)
+    #  command: |
+    #   if ! command -v gzip &> /dev/null; then
+    #    echo "Installing gzip..."
+    #   if command -v yum &> /dev/null; then
+    #  apk add gzip
+    # else
+    #  echo "Error: Package manager not found. Cannot install gzip."
+    # exit 1
+    #fi
+    #fi
 
-          if ! command -v tar &> /dev/null; then
-            echo "Installing tar..."
-            if command -v yum &> /dev/null; then
-              yum install -y tar
-            elif command -v apk &> /dev/null; then
-              apk add tar
-            else
-              echo "Error: Package manager not found. Cannot install tar."
-              exit 1
-            fi
-          fi
+    #if ! command -v tar &> /dev/null; then
+    # echo "Installing tar..."
+    #if command -v yum &> /dev/null; then
+    # yum install -y tar
+    #elif command -v apk &> /dev/null; then
+    # apk add tar
+    #else
+    # echo "Error: Package manager not found. Cannot install tar."
+    #exit 1
+    #fi
+    #fi
     - attach_workspace:
         at: ~/repo
     - run:
@@ -74,8 +72,7 @@ jobs:
         name: Upload to S3
         command: |
           ls -l ~/repo  # Debugging step
-          gzip -c ~/repo/build.zip > ~/repo/build.gz.zip  # Use gzip to compress
-          aws s3 cp ~/repo/build.gz.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1/build.gz.zip
+          aws s3 cp ~/repo/build.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1/build.zip
 
   deploy:
     executor: python-executor
@@ -93,7 +90,7 @@ jobs:
             --region us-east-1 \
             --application-name python-code-deploy-role-rajeev \
             --deployment-group-name python-code-deploy-role \
-            --s3-location bucket=python-assignment-cicd,key=build-$CIRCLE_SHA1/build.gz.zip,bundleType=zip \
+            --s3-location bucket=python-assignment-cicd,key=build-$CIRCLE_SHA1/build.zip,bundleType=zip \
             --description "CircleCI Deployment for $CIRCLE_SHA1"
 
 workflows:
