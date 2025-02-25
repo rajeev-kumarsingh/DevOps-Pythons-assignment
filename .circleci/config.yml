@@ -41,17 +41,22 @@ jobs:
         command: |
           if ! command -v tar &> /dev/null; then
             echo "Installing tar..."
+
           if [ -f /etc/debian_version ]; then
-            sudo apt update && sudo apt install -y tar
+            apt-get update && apt-get install -y tar
           elif [ -f /etc/alpine-release ]; then
-            apk add --no-cache tar
-          elif [ -f /etc/redhat-release ]; then
+             apk add --no-cache tar
+          elif [ -f /etc/redhat-release ] || grep -qi "amazon linux" /etc/os-release; then
+             yum install -y tar
+          elif grep -qi "amazon linux" /etc/os-release; then
             yum install -y tar
           else
-          echo "Unsupported OS, tar installation failed!"
-            exit 1
+            echo "Unsupported OS, tar installation failed!"
+           cat /etc/os-release  # Debugging step
+              exit 1
           fi
           fi
+
     - attach_workspace:
         at: ~/repo
     - run:
