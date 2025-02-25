@@ -42,7 +42,7 @@ jobs:
           if ! command -v tar &> /dev/null; then
             echo "Installing tar..."
           if [ -f /etc/debian_version ]; then
-            apt-get update && apt-get install -y tar
+            sudo apt update && sudo apt install -y tar
           elif [ -f /etc/alpine-release ]; then
             apk add --no-cache tar
           elif [ -f /etc/redhat-release ]; then
