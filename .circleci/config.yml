@@ -75,7 +75,7 @@ jobs:
         command: |
           ls -l ~/repo  # Debugging step
           gzip -c ~/repo/build.zip > ~/repo/build.gz.zip  # Use gzip to compress
-          aws s3 cp ~/repo/build.gz.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1.gz.zip
+          aws s3 cp ~/repo/build.gz.zip s3://python-assignment-cicd/build-$CIRCLE_SHA1/build.gz.zip
 
   deploy:
     executor: python-executor

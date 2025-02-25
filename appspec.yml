@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
 - source: /
-  destination: /home/ubuntu/react-app
+  destination: /home/ubuntu/flask_app
 hooks:
   ApplicationStop:
   - location: scripts/stop_server.sh
