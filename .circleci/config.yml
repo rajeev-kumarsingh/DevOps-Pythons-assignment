@@ -93,7 +93,7 @@ jobs:
             --region us-east-1 \
             --application-name python-code-deploy-role-rajeev \
             --deployment-group-name python-code-deploy-role \
-            --s3-location bucket=python-assignment-cicd,key=build-$CIRCLE_SHA1.zip,bundleType=zip \
+            --s3-location bucket=python-assignment-cicd,key=build-$CIRCLE_SHA1/build.gz.zip,bundleType=zip \
             --description "CircleCI Deployment for $CIRCLE_SHA1"
 
 workflows:
